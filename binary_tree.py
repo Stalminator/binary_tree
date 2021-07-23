@@ -2,10 +2,12 @@ import random
 #from pyvis.network import Network
 import pyvis
 
-net = pyvis.network.Network(height=800,width=800,layout=True)
+net = pyvis.network.Network(height=800,width=2000,layout=True)
+net.options.physics.enabled = False
+net.options.layout.hierarchical.sortMethod = 'directed'
 
-class Node:
-    def __init__(self, data):
+class BinaryTree:
+    def __init__(self, data=None):
         self.data = data
         self.left = None
         self.right = None
@@ -16,25 +18,25 @@ class Node:
                 if self.left:
                     self.left.add_node(data)
                 else:
-                    self.left=Node(data)
+                    self.left=BinaryTree(data)
             elif data > self.data:
                 if self.right:
                     self.right.add_node(data)
                 else:
-                    self.right=Node(data)
-
+                    self.right=BinaryTree(data)
+        else: self.data=data
 
     def print_all(self):
         print(self.data)
         if self.left: self.left.print_all()
         if self.right: self.right.print_all()
 
-    #BFS
-    def print_lvl(self):
+    #BFS and adding nodes
+    def print_lvls(self):
         que=[]
         q={}
         s=1
-        #adding tou queue tree node, number of level and current node data
+        #adding to queue tree node, number of level and current node data
         que.append((self,s,self.data))
         while len(que)>0:
             tmp=que.pop()
@@ -48,43 +50,27 @@ class Node:
                 que.append((tmp[0].right,s+1,tmp[0].data))
                 net.add_node(tmp[0].right.data,color='Green')
                 net.add_edge(tmp[0].data,tmp[0].right.data)
+
             q[s] = q.get(s ,[]) + [(tmp[2],tmp[0].data)]
-            #net.add_node(tmp[2])
-            #net.add_node((tmp[0].data))
-            #net.add_edge(tmp[2],tmp[0].data)
+
         for i,j in q.items():
-            '''
-            net.add_node(i)
-            for x in j:
-                for y in x:
-                    net.add_node(y)
-                    '''
             if i!=1:
                 print('Level ',i,': ',*[','.join(str(x) for x in j)],sep='')
             else:
                 print('Level 1:', self.data)
 
+    def create_graph(self,x):
+        y=set()
+        while len(y) < x:
+            z = random.randrange(1, x + 1)
+            self.add_node(z)
+            y.add(z)
 
+drzewo = BinaryTree()
+drzewo.create_graph(int(input('Podaj ilość węzłów: ')))
+drzewo.print_lvls()
 
-
-x=int(input('Podaj ilość wezłów: '))
-y=set()
-y.add(random.randrange(1,x+1))
-
-drzewo = Node(next(iter(y)))
-while len(y)<x:
-#for k in range(x):
-    z=random.randrange(1,x+1)
-    drzewo.add_node(z)
-    y.add(z)
-    #print(len(y))
-
-
-
-drzewo.print_lvl()
-#print(net.get_nodes())
-net.options.physics.enabled = False
-net.show_buttons()
+#net.show_buttons()
 
 net.show('test.html')
 
