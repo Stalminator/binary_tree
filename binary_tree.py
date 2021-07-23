@@ -23,6 +23,7 @@ class Node:
                 else:
                     self.right=Node(data)
 
+
     def print_all(self):
         print(self.data)
         if self.left: self.left.print_all()
